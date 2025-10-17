@@ -3,7 +3,6 @@
 
 # Chat histories and user data
 chat_histories.json
-*.json
 
 # Logo base64 temporary files
 logo_base64.txt
@@ -119,6 +118,7 @@ dmypy.json
 # IDE files
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 *~
@@ -138,8 +138,8 @@ Thumbs.db
 temp/
 tmp/
 
-# API Keys - Note: key_param.py is included for setup reference
-# Users should update with their own API keys
+# API Keys (security - contains sensitive information)
+key_param.py
 
 # Backup files
 backup/
