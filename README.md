@@ -13,13 +13,14 @@ A powerful, production-grade Retrieval-Augmented Generation (RAG) application th
 ![LangChain](https://img.shields.io/badge/LangChain-latest-green.svg)
 ![Gradio](https://img.shields.io/badge/Gradio-5.0+-orange.svg)
 
-## 🌟 Key Features
+<details>
+<summary><h2>🌟 Key Features</h2></summary>
 
 - **🧠 Multi-Stage Hierarchical RAG**: State-of-the-art 3-stage reasoning architecture
-- **🔍 Chain-of-Thought Reasoning**: Explicit 5-step reasoning process for each chunk
-- **📋 Document-Type Awareness**: Specialized prompts for Policy, Technical, and General documents
-- **📊 Section-Aware Processing**: Automatic section detection and metadata anchoring
-- **🔗 Cross-Reference Intelligence**: Detects and boosts contextually important chunks
+- **� Chain-nof-Thought Reasoning**: Explicit 5-step reasoning process for each chunk
+- **� Deocument-Type Awareness**: Specialized prompts for Policy, Technical, and General documents
+- **� Seoction-Aware Processing**: Automatic section detection and metadata anchoring
+- **� CrFoss-Reference Intelligence**: Detects and boosts contextually important chunks
 - **📤 PDF Upload**: Easy drag-and-drop PDF upload interface
 - **🤖 AI-Powered Q&A**: Ask natural language questions about your documents
 - **💬 Chat Interface**: Interactive chat history with automatic saving
@@ -28,7 +29,10 @@ A powerful, production-grade Retrieval-Augmented Generation (RAG) application th
 - **⚡ Fast Retrieval**: ChromaDB vector database with FlashrankRerank re-ranking
 - **🎨 Beautiful UI**: Clean, modern Gradio web interface with gradient design
 
-## 🏗️ Multi-Stage RAG Architecture
+</details>
+
+<details>
+<summary><h2>🏗️ Multi-Stage RAG Architecture</h2></summary>
 
 Our advanced RAG system uses a **3-stage hierarchical approach** instead of traditional single-stage retrieval:
 
@@ -72,7 +76,10 @@ Question → Retrieve 10 chunks → Chunk-level reasoning → Synthesis → Fina
 - Cross-reference integration and section attribution preserved
 - Produces comprehensive, professional answers with helpful metadata
 
-## 📊 Architecture Diagram
+</details>
+
+<details>
+<summary><h2>📊 Architecture Diagram</h2></summary>
 
 ```
 ┌─────────────────┐
@@ -135,7 +142,10 @@ Question → Retrieve 10 chunks → Chunk-level reasoning → Synthesis → Fina
 └─────────────────┘
 ```
 
-## 🚀 Getting Started
+</details>
+
+<details>
+<summary><h2>🚀 Getting Started</h2></summary>
 
 ### Prerequisites
 
@@ -180,7 +190,10 @@ LLM_API_KEY = "your_openai_api_key_here"
 NVIDIA_API_KEY = "your_nvidia_api_key_here"
 ```
 
-## 📖 Usage
+</details>
+
+<details>
+<summary><h2>📖 Usage</h2></summary>
 
 ### Web Interface (Recommended)
 
@@ -223,7 +236,10 @@ python rag.py
 
 Edit the query at the bottom of `rag.py` to ask different questions.
 
-## 📁 Project Structure
+</details>
+
+<details>
+<summary><h2>📁 Project Structure</h2></summary>
 
 ```
 RAG-MongoDB/
@@ -239,7 +255,10 @@ RAG-MongoDB/
 └── sample_files/          # Sample PDF documents (optional)
 ```
 
-## ⚙️ Configuration
+</details>
+
+<details>
+<summary><h2>⚙️ Configuration</h2></summary>
 
 ### Multi-Stage RAG Parameters
 
@@ -324,7 +343,10 @@ llm = OllamaLLM(model="llama3.2:7b", temperature=0)
 - **Qdrant**: Production-ready with advanced features
 - **Weaviate**: Cloud-native option
 
-## 🎯 Example Questions
+</details>
+
+<details>
+<summary><h2>🎯 Example Questions</h2></summary>
 
 Depending on your uploaded document, try questions like:
 
@@ -342,7 +364,10 @@ The Multi-Stage RAG architecture excels at:
 - ✅ Questions needing synthesis of different perspectives
 - ✅ Detailed explanations with comprehensive context
 
-## 🔧 Troubleshooting
+</details>
+
+<details>
+<summary><h2>🔧 Troubleshooting</h2></summary>
 
 ### "Ollama not found" error
 
@@ -406,7 +431,10 @@ If processing large PDFs:
 2. Increase chunk size: `chunk_size=1000` (fewer chunks)
 3. Use a smaller LLM model
 
-## 🚀 Advanced Usage
+</details>
+
+<details>
+<summary><h2>🚀 Advanced Usage</h2></summary>
 
 ### Batch Processing Multiple PDFs
 
@@ -450,7 +478,10 @@ If you want traditional single-stage RAG (faster but lower quality):
 
 Revert to simple retrieval by replacing the `answer_question` function with basic RAG code.
 
-## 📊 Performance Tips
+</details>
+
+<details>
+<summary><h2>📊 Performance Tips</h2></summary>
 
 1. **Balance quality vs speed**:
    - Quality: `k=10`, larger model (3B or 7B)
@@ -464,7 +495,10 @@ Revert to simple retrieval by replacing the `answer_question` function with basi
 
 4. **Monitor token usage**: Multi-Stage RAG uses more tokens but produces better results
 
-## 🎨 UI Features
+</details>
+
+<details>
+<summary><h2>🎨 UI Features</h2></summary>
 
 - **Compact purple gradient header**
 - **Left sidebar** with:
@@ -477,6 +511,8 @@ Revert to simple retrieval by replacing the `answer_question` function with basi
 - **Timestamp tracking**
 - **Load previous conversations**
 - **Current document display**
+
+</details>
 
 ## 🤝 Contributing
 
@@ -510,7 +546,8 @@ If you encounter issues:
 4. Verify API keys are correct
 5. Make sure Ollama is running
 
-## 🧠 Reasoning-Oriented Prompt Engineering
+<details>
+<summary><h2>🧠 Reasoning-Oriented Prompt Engineering</h2></summary>
 
 ### Chain-of-Thought Scaffolding
 
@@ -552,7 +589,10 @@ Traditional RAG systems use passive prompts like "Answer the question based on t
  4. ASSESS COMPLETENESS: Is there sufficient technical detail?"
 ```
 
-## 🔧 Enhanced Chunking & Metadata Strategy
+</details>
+
+<details>
+<summary><h2>🔧 Enhanced Chunking & Metadata Strategy</h2></summary>
 
 ### Semantic Chunking with Section Awareness
 
@@ -597,7 +637,10 @@ Each chunk includes rich metadata:
 
 **Example:** Question about "MongoDB transactions" will boost chunks from "Transaction Management" sections.
 
-## 🔮 Technical Details
+</details>
+
+<details>
+<summary><h2>🔮 Technical Details</h2></summary>
 
 ### Why Multi-Stage RAG?
 
@@ -634,63 +677,16 @@ Traditional RAG systems retrieve chunks and dump them all into the LLM, expectin
 - **v2.3 Optimized**: 15-20 seconds (1 LLM call)
 - **Quality**: Maintained or improved through better integration
 
-## 🎓 Learning Resources
+</details>
+
+<details>
+<summary><h2>🎓 Learning Resources</h2></summary>
 
 - [LangChain Documentation](https://python.langchain.com/)
 - [Ollama Documentation](https://ollama.com/docs)
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [NVIDIA NIM Documentation](https://build.nvidia.com/explore/discover)
 
----
+</details>
 
-<div align="center">
-
-![Lenroker Logo](Logo/logo.gif)
-
-**🚀 Lenroker - AI-Powered Document Intelligence Platform**
-
-*Built with ❤️ using Multi-Stage Hierarchical RAG, LangChain, Ollama, and Gradio*
-
-*Last updated: October 2025*
-
-</div>
-
-## 🆕 Version History
-
-### v2.3 - Performance Optimization & Clean Output
-- ⚡ **6x faster processing** - reduced from 2+ minutes to 15-20 seconds
-- 🚀 **Batch reasoning** - single LLM call instead of 11 separate calls
-- 🧹 **Clean answer format** - no internal reasoning process shown to users
-- 📊 **Optimized prompting** - integrated analysis and synthesis in one step
-- 🎯 **Maintained quality** - same reasoning depth with better efficiency
-- 💬 **Professional output** - direct, readable answers without technical verbosity
-
-### v2.2 - Reasoning-Oriented Prompt Engineering
-- 🧠 **Chain-of-thought scaffolding** with explicit 5-step reasoning process
-- 📋 **Document-type aware prompts** (Policy, Technical, General)
-- 🔍 **Systematic analysis framework**: Identify → Analyze → Integrate → Assess → Conclude
-- 🎯 **Confidence assessment** for each chunk analysis
-- 📊 **IF/THEN logical mapping** in synthesis stage
-- 🔄 **Reasoning metadata** showing analysis mode and process
-
-### v2.1 - Enhanced Chunking & Metadata Anchoring
-- 🧩 **Semantic chunking** with section-aware boundaries
-- 📊 **Automatic section detection** and metadata tagging
-- 🔗 **Cross-reference intelligence** with boosting
-- 📈 Increased chunk size to 1200 chars for better context
-- 🎯 **Section-aware retrieval** with intelligent scoring
-- 🔄 **FlashrankRerank** re-ranking for top 10 selection
-- 📋 Enhanced synthesis with section context preservation
-
-### v2.0 - Multi-Stage Hierarchical RAG
-- ✨ Implemented 3-stage reasoning architecture
-- 🔄 Chunk-level reasoning with synthesis
-- 📈 Increased retrieval from 3 to 10 chunks
-- 🎯 Automatic relevance filtering
-- 📊 Added reasoning metadata to answers
-
-### v1.0 - Initial Release
-- 📤 PDF upload and processing
-- 💬 Chat interface with history
-- 🔍 Basic RAG with ChromaDB
-- 🎨 Beautiful Gradio UI
+--
