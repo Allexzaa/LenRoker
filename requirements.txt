@@ -1,0 +1,31 @@
+# Core LangChain packages
+langchain>=0.1.0
+langchain-core>=0.3.76
+langchain-community>=0.0.20
+
+# Vector store
+langchain-chroma>=0.2.0
+chromadb>=1.0.0
+
+# Embeddings
+langchain-nvidia-ai-endpoints>=0.1.0
+
+# LLM
+langchain-ollama>=0.3.0
+
+# Document processing
+pypdf>=4.0.0
+
+# Web UI
+gradio>=5.0.0
+
+# Text splitting
+langchain-text-splitters>=0.0.1
+
+# Re-ranking (optional - falls back to section-aware retrieval if unavailable)
+flashrank>=0.2.0
+
+# Additional dependencies
+numpy>=2.0.0
+pydantic>=2.0.0
+typing-extensions>=4.5.0

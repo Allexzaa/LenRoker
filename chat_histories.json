@@ -1,0 +1,17 @@
+{
+  "20251017_002724": {
+    "title": "What are the Net Tangible Benefit (NTB) rate-diffe...",
+    "timestamp": "2025-10-17T00:27:24.512664",
+    "document": "uploaded_document.pdf",
+    "messages": [
+      {
+        "role": "user",
+        "content": "What is the standard maximum LTV for Identity-of-Interest transactions, and under what four scenarios may the 85 % restriction be waived?"
+      },
+      {
+        "role": "assistant",
+        "content": "The standard maximum LTV for Identity-of-Interest transactions is 85%. The 85% restriction may be waived under four scenarios:\n\n1. Family Member Transactions \n   - The principal residence of another family member; or \n   - A property owned by another family member in which the borrower has been a tenant for at least 6 months immediately predating the sales contract, provided there is written evidence to verify tenancy and occupancy.\n\n2. Builder\u2019s Employee Purchase \n   An employee of a builder, who is not a family member, purchases one of the builder's new houses or models as a principal residence.\n\n3. Corporate Transfer\nNo specific details are given for this scenario in the provided chunks.\n\n*[Reasoning Mode: General | Analyzed 10 chunks | Sections: Unknown Section, General Content]*"
+      }
+    ]
+  }
+}
