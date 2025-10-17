@@ -18,7 +18,7 @@ A powerful, production-grade Retrieval-Augmented Generation (RAG) application th
 
 - **🧠 Multi-Stage Hierarchical RAG**: State-of-the-art 3-stage reasoning architecture
 - **� Chain-nof-Thought Reasoning**: Explicit 5-step reasoning process for each chunk
-- **� Deocument-Type Awareness**: Specialized prompts for Policy, Technical, and General documents
+- **📋 Document-Type Awareness**: Specialized prompts for Technical and General documents
 - **� Seoction-Aware Processing**: Automatic section detection and metadata anchoring
 - **� CrFoss-Reference Intelligence**: Detects and boosts contextually important chunks
 - **📤 PDF Upload**: Easy drag-and-drop PDF upload interface
@@ -62,7 +62,7 @@ Question → Retrieve 10 chunks → Chunk-level reasoning → Synthesis → Fina
 
 ### **Stage 2: Optimized Batch Reasoning**
 - **Single LLM call** processes all chunks simultaneously (6x faster)
-- **Document-type aware** prompts (General, Policy, Technical)
+- **Document-type aware** prompts (General, Technical)
 - **Integrated analysis**: Scanning → Extraction → Integration → Synthesis
 - Section metadata and cross-references preserved in analysis
 - **Clean output**: Professional answers without internal reasoning verbosity
@@ -173,17 +173,28 @@ pip install -r requirements.txt
 
 3. **Configure API Keys**
 
-Edit the `key_param.py` file and add your NVIDIA API keys:
+Create a `.env` file from the template and add your NVIDIA API keys:
 
-```python
-# API key for NVIDIA embeddings (Llama 3.2 NeMo Retriever)
-NVIDIA_API_KEY = "your_nvidia_embeddings_api_key_here"
-
-# API key for NVIDIA reasoning model (Llama 3.1 Nemotron Nano 8B)
-NVIDIA_REASONING_API_KEY = "your_nvidia_reasoning_api_key_here"
+```bash
+# Copy the template file
+cp .env.example .env
 ```
 
-**Note:** You can use the same NVIDIA API key for both if you have access to both models.
+Then edit the `.env` file and add your NVIDIA API keys:
+
+```bash
+# API key for NVIDIA embeddings (Llama 3.2 NeMo Retriever)
+NVIDIA_API_KEY=your_nvidia_embeddings_api_key_here
+
+# API key for NVIDIA reasoning model (Llama 3.1 Nemotron Nano 8B)
+NVIDIA_REASONING_API_KEY=your_nvidia_reasoning_api_key_here
+```
+
+**Security Notes:**
+- The `.env` file is automatically ignored by git for security
+- Never commit API keys to version control
+- You can use the same NVIDIA API key for both if you have access to both models
+- Get your API keys from: [NVIDIA API Console](https://build.nvidia.com/)
 
 </details>
 
@@ -559,23 +570,22 @@ Traditional RAG systems use passive prompts like "Answer the question based on t
 ### Document-Type Aware Reasoning
 
 **Automatic Document Type Detection:**
-- **Policy Documents**: Focus on compliance, rules, and regulatory requirements
 - **Technical Documents**: Emphasize implementation, specifications, and methods
 - **General Documents**: Balanced analysis of facts and concepts
 
 **Specialized Reasoning Templates:**
 ```python
-# Policy Analysis Example
-"1. IDENTIFY APPLICABLE RULES: What policies apply to this scenario?
- 2. ANALYZE CONDITIONS: What conditions or exceptions exist?
- 3. DETERMINE COMPLIANCE: How do rules relate to the question?
- 4. ASSESS AUTHORITY: What's the authoritative basis?"
-
 # Technical Analysis Example  
 "1. IDENTIFY TECHNICAL CONCEPTS: What methods or specs are mentioned?
  2. ANALYZE RELATIONSHIPS: How do technical elements connect?
  3. EVALUATE IMPLEMENTATION: What are practical implications?
  4. ASSESS COMPLETENESS: Is there sufficient technical detail?"
+
+# General Analysis Example
+"1. IDENTIFY RELEVANT INFORMATION: What facts and concepts relate to the question?
+ 2. ANALYZE CONTEXT: How does section context help interpret information?
+ 3. LOGICAL INTEGRATION: How do elements connect to answer the question?
+ 4. CONFIDENCE ASSESSMENT: How reliable is this information?"
 ```
 
 </details>

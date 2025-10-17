@@ -11,6 +11,7 @@ static_logo.gif
 # Vector databases (user-specific)
 chroma_db/
 chroma_db_temp/
+chroma_db_*/
 
 # Python cache and bytecode
 __pycache__/
@@ -138,8 +139,9 @@ Thumbs.db
 temp/
 tmp/
 
-# API Keys (security - contains sensitive information)
-key_param.py
+# API Keys and sensitive configuration
+# Note: key_param.py now uses environment variables and can be committed
+# .env file contains actual API keys and should never be committed
 
 # Backup files
 backup/
