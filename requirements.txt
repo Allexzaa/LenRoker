@@ -10,8 +10,8 @@ chromadb>=1.0.0
 # Embeddings
 langchain-nvidia-ai-endpoints>=0.1.0
 
-# LLM
-langchain-ollama>=0.3.0
+# LLM - Using NVIDIA API via OpenAI client (included in langchain-nvidia-ai-endpoints)
+openai>=1.0.0
 
 # Document processing
 pypdf>=4.0.0

@@ -25,7 +25,7 @@ A powerful, production-grade Retrieval-Augmented Generation (RAG) application th
 - **🤖 AI-Powered Q&A**: Ask natural language questions about your documents
 - **💬 Chat Interface**: Interactive chat history with automatic saving
 - **📜 Persistent History**: All conversations saved with timestamps
-- **🔒 100% Local LLM**: Llama 3.2 3B runs locally via Ollama (embeddings via NVIDIA API)
+- **🔒 Cloud-Powered LLM**: Llama 3.1 Nemotron Nano 8B via NVIDIA API (embeddings via NVIDIA API)
 - **⚡ Fast Retrieval**: ChromaDB vector database with FlashrankRerank re-ranking
 - **🎨 Beautiful UI**: Clean, modern Gradio web interface with gradient design
 
@@ -119,7 +119,8 @@ Question → Retrieve 10 chunks → Chunk-level reasoning → Synthesis → Fina
          ▼
 ┌──────────────────────────────────────────┐
 │   STAGE 2: OPTIMIZED BATCH REASONING     │
-│  Single LLM call processes all chunks:   │
+│  Single NVIDIA API call processes all:   │
+│  • Llama 3.1 Nemotron Nano 8B model     │
 │  • Document-type aware analysis          │
 │  • Cross-section integration             │
 │  • Comprehensive synthesis               │
@@ -149,11 +150,10 @@ Question → Retrieve 10 chunks → Chunk-level reasoning → Synthesis → Fina
 
 ### Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you begin, ensure you have the following:
 
 - **Python 3.10+**: [Download Python](https://www.python.org/downloads/)
-- **Ollama**: [Download Ollama](https://ollama.com/download)
-- **NVIDIA API Key**: [Get API Key](https://build.nvidia.com/)
+- **NVIDIA API Key**: [Get API Key](https://build.nvidia.com/) - Required for both embeddings and reasoning
 
 ### Installation
 
@@ -171,24 +171,19 @@ pip install -r requirements.txt
 
 **Note:** If you encounter issues with `flashrank` installation, the system will automatically fall back to section-aware retrieval without re-ranking. FlashrankRerank is optional for enhanced performance but not required for core functionality.
 
-3. **Install Ollama and pull the Llama model**
+3. **Configure API Keys**
 
-```bash
-# After installing Ollama, pull the model
-ollama pull llama3.2:3b
-```
-
-4. **Configure API Keys**
-
-Edit the `key_param.py` file and add your API keys:
+Edit the `key_param.py` file and add your NVIDIA API keys:
 
 ```python
-# API key for OpenAI (optional - not used in current version)
-LLM_API_KEY = "your_openai_api_key_here"
+# API key for NVIDIA embeddings (Llama 3.2 NeMo Retriever)
+NVIDIA_API_KEY = "your_nvidia_embeddings_api_key_here"
 
-# API key for NVIDIA embeddings (required)
-NVIDIA_API_KEY = "your_nvidia_api_key_here"
+# API key for NVIDIA reasoning model (Llama 3.1 Nemotron Nano 8B)
+NVIDIA_REASONING_API_KEY = "your_nvidia_reasoning_api_key_here"
 ```
+
+**Note:** You can use the same NVIDIA API key for both if you have access to both models.
 
 </details>
 
@@ -306,29 +301,26 @@ embeddings = HuggingFaceEmbeddings(
 
 ### LLM Model
 
-**Current:** Llama 3.2 3B (via Ollama)
-- Runs 100% locally
-- No API costs after NVIDIA embeddings
+**Current:** Llama 3.1 Nemotron Nano 8B (via NVIDIA API)
+- Cloud-powered reasoning model
+- Optimized for instruction following and reasoning
 - Good balance of speed and quality
 - Perfect for multi-stage reasoning
+- API-based - no local installation required
 
-**Alternative models:**
+**Alternative NVIDIA models:**
 
-```bash
-# Smaller/faster
-ollama pull llama3.2:1b
-
-# Larger/better quality
-ollama pull llama3.2:7b
-
-# Different models
-ollama pull phi3:mini
-ollama pull gemma2:2b
-```
-
-Update in code:
+Update the model in `key_param.py`:
 ```python
-llm = OllamaLLM(model="llama3.2:7b", temperature=0)
+def query_nvidia_model(messages, temperature=0, max_tokens=4096):
+    completion = client.chat.completions.create(
+        model="nvidia/llama-3.1-nemotron-nano-8b-v1",  # Current model
+        # Alternative: "nvidia/llama-3.2-3b-instruct"
+        # Alternative: "nvidia/llama-3.1-8b-instruct"
+        messages=messages,
+        temperature=temperature,
+        # ... other parameters
+    )
 ```
 
 ### Vector Database
@@ -369,18 +361,15 @@ The Multi-Stage RAG architecture excels at:
 <details>
 <summary><h2>🔧 Troubleshooting</h2></summary>
 
-### "Ollama not found" error
-
-Make sure Ollama is installed and running:
-```bash
-ollama --version
-ollama list
-```
-
 ### "NVIDIA API key invalid" error
 
-1. Check your API key in `key_param.py`
-2. Verify it's active at [NVIDIA API Console](https://build.nvidia.com/)
+1. Check your API keys in `key_param.py`
+2. Verify they're active at [NVIDIA API Console](https://build.nvidia.com/)
+3. Ensure you have access to both embedding and reasoning models
+4. Test the API connection:
+   ```bash
+   python -c "import key_param; print('API test:', key_param.query_nvidia_model([{'role': 'user', 'content': 'Hello'}]))"
+   ```
 
 ### "FlashrankRerank rebuild skipped" warning
 
@@ -417,19 +406,20 @@ Then re-run `python app.py` or `python load_data.py`
 
 ### Slow response times
 
-The Multi-Stage RAG makes multiple LLM calls, which is more thorough but slower:
+The Multi-Stage RAG uses optimized batch processing for speed:
 
-**To speed up:**
+**To speed up further:**
 1. Reduce chunks: `search_kwargs={"k": 5}` (instead of 10)
-2. Use smaller model: `ollama pull llama3.2:1b`
-3. Use GPU: Ollama automatically uses GPU if available
+2. Reduce max_tokens: `max_tokens=2048` (instead of 4096)
+3. Check your internet connection (API-based model)
 
-### Out of memory errors
+### API rate limiting or quota errors
 
-If processing large PDFs:
+If you encounter API limits:
 1. Reduce chunk retrieval: `k=5` instead of 10
 2. Increase chunk size: `chunk_size=1000` (fewer chunks)
-3. Use a smaller LLM model
+3. Add delays between requests if needed
+4. Check your NVIDIA API quota and usage
 
 </details>
 
@@ -487,7 +477,7 @@ Revert to simple retrieval by replacing the `answer_question` function with basi
    - Quality: `k=10`, larger model (3B or 7B)
    - Speed: `k=5`, smaller model (1B)
 
-2. **GPU acceleration**: Ollama automatically uses GPU when available
+2. **API optimization**: NVIDIA API handles GPU acceleration automatically
 
 3. **Chunk size optimization**:
    - Technical docs: 500-700 chars
@@ -530,11 +520,10 @@ This project is open source and available for educational and personal use.
 ## 🙏 Acknowledgments
 
 - **LangChain**: Framework for LLM applications
-- **Ollama**: Local LLM runtime
-- **NVIDIA**: NeMo embedding models and inference API
+- **NVIDIA**: NeMo embedding models and Nemotron reasoning models via API
 - **Gradio**: Web UI framework
 - **ChromaDB**: Vector database
-- **Meta**: Llama 3.2 model
+- **Meta**: Llama foundation models
 
 ## 📧 Support
 
@@ -543,8 +532,8 @@ If you encounter issues:
 1. Check the Troubleshooting section above
 2. Review the error messages carefully
 3. Ensure all dependencies are installed
-4. Verify API keys are correct
-5. Make sure Ollama is running
+4. Verify both NVIDIA API keys are correct and active
+5. Test API connectivity with the provided test command
 
 <details>
 <summary><h2>🧠 Reasoning-Oriented Prompt Engineering</h2></summary>
@@ -587,6 +576,52 @@ Traditional RAG systems use passive prompts like "Answer the question based on t
  2. ANALYZE RELATIONSHIPS: How do technical elements connect?
  3. EVALUATE IMPLEMENTATION: What are practical implications?
  4. ASSESS COMPLETENESS: Is there sufficient technical detail?"
+```
+
+</details>
+
+<details>
+<summary><h2>☁️ Cloud-Powered Architecture</h2></summary>
+
+### NVIDIA API Integration
+
+Lenroker now uses **100% cloud-powered AI** via NVIDIA's API infrastructure:
+
+**Embedding Model**: NVIDIA Llama 3.2 NeMo Retriever (300M)
+- Optimized specifically for retrieval tasks
+- High-quality vector representations
+- Fast embedding generation
+
+**Reasoning Model**: NVIDIA Llama 3.1 Nemotron Nano 8B
+- Instruction-tuned for reasoning and analysis
+- Optimized for multi-step thinking
+- Superior performance on complex questions
+
+**Benefits of API-Based Architecture:**
+- ✅ **No local installation** - No need for Ollama or local model management
+- ✅ **Always up-to-date** - Access to latest model versions automatically
+- ✅ **GPU acceleration** - NVIDIA's infrastructure handles optimization
+- ✅ **Scalable** - No local hardware limitations
+- ✅ **Consistent performance** - Professional-grade inference infrastructure
+
+**API Configuration:**
+```python
+# In key_param.py
+def get_nvidia_client():
+    return OpenAI(
+        base_url="https://integrate.api.nvidia.com/v1",
+        api_key=NVIDIA_REASONING_API_KEY
+    )
+
+def query_nvidia_model(messages, temperature=0, max_tokens=4096):
+    client = get_nvidia_client()
+    completion = client.chat.completions.create(
+        model="nvidia/llama-3.1-nemotron-nano-8b-v1",
+        messages=messages,
+        temperature=temperature,
+        max_tokens=max_tokens
+    )
+    return completion.choices[0].message.content
 ```
 
 </details>
@@ -683,7 +718,7 @@ Traditional RAG systems retrieve chunks and dump them all into the LLM, expectin
 <summary><h2>🎓 Learning Resources</h2></summary>
 
 - [LangChain Documentation](https://python.langchain.com/)
-- [Ollama Documentation](https://ollama.com/docs)
+- [NVIDIA NIM API Documentation](https://docs.nvidia.com/nim/)
 - [ChromaDB Documentation](https://docs.trychroma.com/)
 - [NVIDIA NIM Documentation](https://build.nvidia.com/explore/discover)
 

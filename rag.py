@@ -1,11 +1,28 @@
-# Import ChromaDB and NVIDIA embeddings for local vector search
+# =============================================================================
+# RAG.PY - Simple RAG Query Interface for Lenroker
+# =============================================================================
+# This file provides a simplified command-line interface for testing the RAG
+# system independently of the main Gradio web application.
+#
+# Key Components:
+# - ChromaDB vector store loading from disk
+# - NVIDIA embeddings for document retrieval  
+# - NVIDIA API for reasoning (Llama 3.1 Nemotron Nano 8B)
+# - Section-aware document formatting with metadata
+# - 5-step reasoning process for comprehensive analysis
+#
+# Usage: python rag.py
+# Note: Requires existing ChromaDB database from load_data.py
+# =============================================================================
+
+# Import ChromaDB and NVIDIA embeddings for vector search
 from langchain_chroma import Chroma
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 import key_param
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
-from langchain_ollama import OllamaLLM
+# Removed OllamaLLM import - now using NVIDIA API directly via key_param
 
 
 
@@ -21,8 +38,28 @@ vectorStore = Chroma(
     embedding_function=embeddings
 )
 def query_data(query):
+    """
+    Query the document database using RAG (Retrieval-Augmented Generation).
+    
+    This function implements a simplified version of Lenroker's RAG system
+    for command-line testing and development purposes.
+    
+    Process:
+    1. Retrieve top 5 most similar document chunks using NVIDIA embeddings
+    2. Format chunks with section metadata for better context
+    3. Apply 5-step reasoning template for systematic analysis
+    4. Generate response using NVIDIA Llama 3.1 Nemotron Nano 8B
+    
+    Args:
+        query (str): Question to ask about the loaded document
+        
+    Returns:
+        str: AI-generated answer based on retrieved document chunks
+        
+    Note: Requires ChromaDB database to exist (run load_data.py first)
+    """
     # Create section-aware retriever for similarity search
-    # k=5: Return top 5 most similar documents (increased for better context)
+    # k=5: Return top 5 most similar documents (optimized for context vs speed)
     retriever = vectorStore.as_retriever(
         search_type="similarity",
         search_kwargs={
@@ -79,18 +116,20 @@ REASONING & FINAL ANSWER:
         "question": RunnablePassthrough()
         }
 
-    llm = OllamaLLM(model="llama3.2:3b", temperature=0)
-
-    response_parser = StrOutputParser()
-
-    rag_chain = (
-        retrieve
-        | custom_rag_prompt
-        | llm
-        | response_parser
-    )
-
-    answer = rag_chain.invoke(query)
+    # Use NVIDIA API instead of Ollama
+    # Get context documents
+    docs = retriever.invoke(query)
+    context = format_docs_with_metadata(docs)
+    
+    # Format the prompt
+    prompt_text = custom_rag_prompt.format(context=context, question=query)
+    
+    messages = [
+        {"role": "system", "content": "You are an expert document analyst. Provide clear, comprehensive answers based on the provided context."},
+        {"role": "user", "content": prompt_text}
+    ]
+    
+    answer = key_param.query_nvidia_model(messages, temperature=0)
     
 
     return answer

@@ -12,12 +12,18 @@ Key Features:
 - Document-type aware prompts (Policy, Technical, General)
 - FlashrankRerank re-ranking for optimal chunk selection
 - 6x performance improvement through batch processing
-- Beautiful, responsive Gradio web interface
+- Beautiful, responsive Gradio web interface with modern 3D avatars
 - Persistent chat history with automatic saving
-- 100% local LLM processing (Llama 3.2 3B via Ollama)
+- Cloud-powered AI via NVIDIA API (Llama 3.1 Nemotron Nano 8B)
+- Modern 3D UI with Font Awesome integration and gradient designs
+
+Architecture:
+- Stage 1: Section-Aware Retrieval + Re-ranking (FlashrankRerank)
+- Stage 2: Optimized Batch Reasoning (Single NVIDIA API call)
+- Stage 3: Clean Output (Professional responses without metadata)
 
 Author: Lenroker Team
-Version: 2.3 - Performance Optimization & Clean Output
+Version: 2.4 - NVIDIA API Integration & Modern 3D UI
 License: MIT
 """
 
@@ -27,7 +33,7 @@ from langchain_chroma import Chroma
 from langchain_community.document_loaders import PyPDFLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
-from langchain_ollama import OllamaLLM
+# Removed OllamaLLM import - using NVIDIA API directly
 from langchain.prompts import PromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.output_parsers import StrOutputParser
@@ -74,7 +80,23 @@ embeddings = NVIDIAEmbeddings(
 # REASONING-ORIENTED PROMPT TEMPLATES
 # =============================================================================
 def get_reasoning_prompts(document_type="general"):
-    """Get specialized reasoning prompts based on document type"""
+    """
+    Get specialized reasoning prompts based on document type.
+    
+    This function provides document-type-aware prompts that guide the AI through
+    systematic analysis tailored to different content types.
+    
+    Args:
+        document_type (str): Type of document ('general', 'policy', 'technical')
+        
+    Returns:
+        dict: Dictionary containing 'chunk_reasoning' and 'synthesis' prompt templates
+        
+    Document Types:
+        - 'general': Balanced analysis for general documents
+        - 'policy': Compliance-focused analysis for regulatory documents  
+        - 'technical': Implementation-focused analysis for technical docs
+    """
     
     prompts = {
         "general": {
@@ -293,17 +315,33 @@ def process_pdf(pdf_file):
     """
     Process uploaded PDF document and create vector store with enhanced metadata.
     
+    This function implements advanced document processing with section-aware chunking
+    and metadata extraction for optimal retrieval performance.
+    
     Features:
-    - Semantic chunking with section-aware boundaries
+    - Semantic chunking with section-aware boundaries (1200 chars, 200 overlap)
     - Automatic section detection and metadata tagging
-    - Cross-reference intelligence
+    - Cross-reference intelligence and boosting
     - Enhanced document metadata for better retrieval
+    - ChromaDB vector store creation with NVIDIA embeddings
+    
+    Processing Pipeline:
+    1. Load PDF using PyPDFLoader
+    2. Filter out pages with insufficient content (< 20 words)
+    3. Apply semantic text splitting with section awareness
+    4. Extract section metadata and cross-references
+    5. Generate embeddings using NVIDIA Llama 3.2 NeMo Retriever
+    6. Store in ChromaDB with enhanced metadata
     
     Args:
-        pdf_file: Uploaded PDF file object
+        pdf_file: Uploaded PDF file object from Gradio interface
         
     Returns:
         str: Success/error message for user feedback
+        
+    Global Variables Modified:
+        - vectorstore: ChromaDB instance for document retrieval
+        - current_pdf_name: Name of the currently loaded document
     """
     global vectorstore, current_pdf_name
 
@@ -405,41 +443,93 @@ def answer_question(question, chat_history):
     """
     Answer questions using advanced Multi-Stage Hierarchical RAG Architecture.
     
+    This is the core function that implements Lenroker's sophisticated 3-stage
+    reasoning system for document intelligence. Optimized for 6x faster processing
+    while maintaining high-quality answers.
+    
     Architecture Overview:
+    
     Stage 1: Section-Aware Retrieval + Re-ranking
         - Retrieves top 20 candidate chunks with section-aware boosting
-        - FlashrankRerank re-ranking to select best 10 chunks
-        - Cross-reference and section keyword boosting
+        - FlashrankRerank re-ranking to select best 10 chunks  
+        - Cross-reference and section keyword boosting (+0.2-0.3 score)
+        - Larger chunk preference for more context (+0.1 score)
         
-    Stage 2: Optimized Batch Reasoning
-        - Single LLM call processes all chunks simultaneously (6x faster)
+    Stage 2: Optimized Batch Reasoning (6x Performance Improvement)
+        - Single NVIDIA API call processes all chunks simultaneously
         - Document-type aware analysis (Policy/Technical/General)
-        - Integrated analysis and synthesis in one step
+        - Integrated analysis and synthesis in one optimized prompt
+        - Uses Llama 3.1 Nemotron Nano 8B for superior reasoning
         
-    Stage 3: Metadata Enhancement
-        - Adds reasoning mode and section information
-        - Clean, professional output without technical verbosity
+    Stage 3: Clean Output
+        - Professional responses without technical metadata
+        - Clean user experience with hidden complexity
+        - Automatic chat history management and persistence
+    
+    Performance Optimizations:
+    - Reduced from 11 LLM calls (v2.2) to 1 call (v2.4)
+    - Maintained answer quality while achieving 6x speed improvement
+    - Batch processing eliminates redundant API calls
+    - Smart section-aware retrieval reduces irrelevant chunks
         
     Args:
         question (str): User's question about the document
-        chat_history (list): Current conversation history
+        chat_history (list): Current conversation history in Gradio format
         
     Returns:
-        tuple: Updated chat history, cleared input, updated history list
+        tuple: (updated_chat_history, cleared_input, updated_history_list)
+            - updated_chat_history: Chat with new Q&A pair added
+            - cleared_input: Empty string to clear the input box
+            - updated_history_list: Refreshed chat history sidebar
+        
+    Global Variables Used:
+        - vectorstore: ChromaDB instance for document retrieval
+        - current_pdf_name: Name of currently loaded document
+        - current_chat_id: ID of active chat session
+        - chat_history_store: Persistent chat storage
+        
+    Error Handling:
+        - Returns helpful onboarding message if no document loaded
+        - Graceful fallback if FlashrankRerank fails
+        - Comprehensive error messages for API failures
     """
     global vectorstore, current_pdf_name, current_chat_id, chat_history_store
 
     if vectorstore is None:
         chat_history.append({"role": "user", "content": question})
-        chat_history.append({"role": "assistant", "content": "⚠️ Please upload a PDF document first before asking questions."})
+        helpful_message = """📋 **Welcome to Lenroker - AI Document Intelligence!**
+
+I'm designed to analyze PDF documents and answer questions about their content using advanced AI reasoning.
+
+**To get started:**
+1. 📤 Upload a PDF document using the sidebar
+2. 🔄 Click "Process Document" and wait for confirmation
+3. 💬 Ask me anything about your document's content
+
+**What I can help with:**
+- Summarize document sections
+- Extract specific information
+- Answer complex questions requiring multi-section analysis
+- Explain technical concepts from your documents
+- Compare information across different parts of your document
+
+**Example questions after uploading:**
+- "What are the main topics covered?"
+- "Summarize the key findings"
+- "What does section 3 discuss about [topic]?"
+
+Ready to analyze your document! 🚀"""
+        
+        chat_history.append({"role": "user", "content": question})
+        chat_history.append({"role": "assistant", "content": helpful_message})
         return chat_history, "", get_chat_history_list()
 
     if not question or question.strip() == "":
         return chat_history, question, get_chat_history_list()
 
     try:
-        # Initialize LLM
-        llm = OllamaLLM(model="llama3.2:3b", temperature=0)
+        # Initialize NVIDIA reasoning model via API
+        # No need to initialize - we'll use key_param.query_nvidia_model directly
 
         # =====================================================================
         # STAGE 1: SECTION-AWARE RETRIEVAL + RE-RANKING
@@ -570,9 +660,13 @@ INSTRUCTIONS:
 
 ANSWER:"""
 
-        # Single LLM call for all chunks
+        # Single NVIDIA API call for all chunks
         try:
-            final_answer = llm.invoke(batch_reasoning_template)
+            messages = [
+                {"role": "system", "content": "You are an expert document analyst. Provide clear, comprehensive answers based on the provided context."},
+                {"role": "user", "content": batch_reasoning_template}
+            ]
+            final_answer = key_param.query_nvidia_model(messages, temperature=0)
             
             # Create section summary for metadata
             sections_analyzed = list(section_context.keys())
@@ -589,25 +683,15 @@ ANSWER:"""
             return chat_history, "", get_chat_history_list()
 
         # =====================================================================
-        # STAGE 3: METADATA ENHANCEMENT (No additional LLM call needed)
+        # STAGE 3: CLEAN OUTPUT (No additional LLM call needed)
         # =====================================================================
-        # The batch reasoning already includes synthesis, so we just enhance metadata
+        # The batch reasoning already includes synthesis, provide clean answer
 
-        # Add enhanced metadata about reasoning process
-        answer_with_metadata = final_answer.strip()
-        
-        metadata_parts = []
-        metadata_parts.append(f"Reasoning Mode: {document_type.title()}")
-        metadata_parts.append(f"Analyzed {len(retrieved_docs)} chunks")
-        if len(section_context) > 1:
-            sections_list = ", ".join(section_context.keys())
-            metadata_parts.append(f"Sections: {sections_list}")
-        
-        if metadata_parts:
-            answer_with_metadata += f"\n\n*[{' | '.join(metadata_parts)}]*"
+        # Use clean answer without metadata
+        clean_answer = final_answer.strip()
 
         chat_history.append({"role": "user", "content": question})
-        chat_history.append({"role": "assistant", "content": answer_with_metadata})
+        chat_history.append({"role": "assistant", "content": clean_answer})
 
         # Save to history
         if current_chat_id is None:
@@ -710,6 +794,9 @@ load_chat_histories()
 # =============================================================================
 # Professional, modern styling with optimized layout for maximum chat space
 custom_css = """
+/* Font Awesome CDN Import */
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+
 /* Global Styling */
 .gradio-container {
     max-width: none !important;
@@ -885,6 +972,103 @@ custom_css = """
     box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.05) !important;
     flex-grow: 1;
     overflow-y: auto;
+}
+
+/* Modern 3D Avatar System with Font Awesome Icons */
+
+/* Base 3D Avatar Container */
+.chatbot .avatar-container img,
+.chatbot img[alt="avatar"],
+.chatbot .message .avatar img {
+    width: 52px !important;
+    height: 52px !important;
+    border-radius: 16px !important;
+    object-fit: cover !important;
+    border: none !important;
+    position: relative !important;
+    transform: translateZ(0) !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+    overflow: hidden !important;
+}
+
+/* User Avatar - Modern Blue Gradient Background */
+.chatbot .message[data-role="user"] .avatar img,
+.chatbot .message.user .avatar img {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%) !important;
+    box-shadow: 
+        0 10px 25px rgba(102, 126, 234, 0.4),
+        0 5px 10px rgba(102, 126, 234, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* AI Avatar - Modern Pink/Purple Gradient Background */
+.chatbot .message[data-role="assistant"] .avatar img,
+.chatbot .message.assistant .avatar img,
+.chatbot .message.bot .avatar img {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 50%, #4facfe 100%) !important;
+    box-shadow: 
+        0 10px 25px rgba(240, 147, 251, 0.4),
+        0 5px 10px rgba(245, 87, 108, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3),
+        inset 0 -1px 0 rgba(0, 0, 0, 0.1) !important;
+    animation: aiPulse 3s ease-in-out infinite !important;
+}
+
+/* Hover Effects */
+.chatbot .avatar-container img:hover,
+.chatbot img[alt="avatar"]:hover,
+.chatbot .message .avatar img:hover {
+    transform: translateY(-3px) scale(1.05) !important;
+    box-shadow: 
+        0 15px 35px rgba(102, 126, 234, 0.5),
+        0 8px 15px rgba(102, 126, 234, 0.3),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4),
+        inset 0 -2px 0 rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Pulse Animation for AI */
+@keyframes aiPulse {
+    0%, 100% { 
+        box-shadow: 
+            0 10px 25px rgba(240, 147, 251, 0.4),
+            0 5px 10px rgba(245, 87, 108, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    }
+    50% { 
+        box-shadow: 
+            0 15px 35px rgba(240, 147, 251, 0.6),
+            0 8px 15px rgba(245, 87, 108, 0.4),
+            inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    }
+}
+
+/* Enhanced Avatar Spacing */
+.chatbot .message .avatar {
+    margin-right: 12px !important;
+}
+
+/* Hide default Gradio clear button in chatbot */
+.chatbot .clear-button,
+.chatbot button[title="Clear"],
+.chatbot .chatbot-header button,
+.chatbot .header button,
+.chatbot .clear,
+.chatbot .icon-button {
+    display: none !important;
+}
+
+/* Hide any clear/delete icons in the chatbot header */
+.chatbot .chatbot-header .icon,
+.chatbot .header .icon,
+.chatbot svg[data-testid="clear"],
+.chatbot button svg {
+    display: none !important;
+}
+
+/* Hide the entire chatbot header if it only contains the clear button */
+.chatbot .chatbot-header:has(button):not(:has(*:not(button))) {
+    display: none !important;
 }
 
 /* Input Area */
@@ -1107,7 +1291,7 @@ with gr.Blocks(css=custom_css, title="Lenroker - AI Document Intelligence", them
                     render_markdown=True,
                     elem_classes="chatbot",
                     bubble_full_width=False,
-                    avatar_images=("🧑‍💼", "🤖")
+                    avatar_images=("user_fa.svg", "ai_fa.svg")
                 )
 
                 # Enhanced input area with better layout
@@ -1122,13 +1306,13 @@ with gr.Blocks(css=custom_css, title="Lenroker - AI Document Intelligence", them
                     )
                     with gr.Column(scale=1, min_width=120):
                         submit_btn = gr.Button(
-                            "🚀 Ask Lenroker",
+                            "Ask Lenroker",
                             variant="primary",
                             size="lg",
                             elem_classes="primary-btn"
                         )
                         clear_btn = gr.Button(
-                            "🧹 Clear Chat",
+                            "Clear Chat",
                             size="sm",
                             elem_classes="secondary-btn"
                         )
@@ -1142,7 +1326,7 @@ with gr.Blocks(css=custom_css, title="Lenroker - AI Document Intelligence", them
             <br>
             <strong>Features:</strong> Multi-Stage RAG • Section-Aware Analysis • 6x Faster Processing • Clean Professional Output
             <br>
-            <strong>Technology:</strong> NVIDIA Llama NeMo • Llama 3.2 3B • FlashrankRerank • ChromaDB • LangChain
+            <strong>Technology:</strong> NVIDIA Llama NeMo • Llama 3.1 Nemotron Nano 8B • FlashrankRerank • ChromaDB • LangChain
         </div>
     """)
 
@@ -1196,7 +1380,7 @@ with gr.Blocks(css=custom_css, title="Lenroker - AI Document Intelligence", them
 if __name__ == "__main__":
     print("🚀 Starting Lenroker - AI Document Intelligence Platform...")
     print("🌐 Server: http://127.0.0.1:7860")
-    print("🤖 Loading AI models...")
+    print("🤖 Using NVIDIA API: Llama 3.1 Nemotron Nano 8B for reasoning")
     print("⚡ Performance: 6x faster processing with optimized batch reasoning")
     print("🎯 Ready for intelligent document analysis!")
 

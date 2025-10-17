@@ -1,3 +1,28 @@
+# =============================================================================
+# LOAD_DATA.PY - Document Processing & Vector Store Creation for Lenroker
+# =============================================================================
+# This script processes PDF documents and creates a ChromaDB vector store
+# for the Lenroker AI Document Intelligence Platform.
+#
+# Key Features:
+# - Advanced semantic chunking with section-aware boundaries
+# - Automatic section detection and metadata extraction
+# - Cross-reference intelligence for better context
+# - NVIDIA embeddings for high-quality vector representations
+# - ChromaDB persistence for fast retrieval
+#
+# Usage: python load_data.py
+# Output: Creates ./chroma_db/ directory with vector embeddings
+#
+# Processing Pipeline:
+# 1. Load PDF using PyPDFLoader
+# 2. Filter pages with insufficient content
+# 3. Apply semantic text splitting (1200 chars, 200 overlap)
+# 4. Extract section metadata and cross-references
+# 5. Generate NVIDIA embeddings (Llama 3.2 NeMo Retriever)
+# 6. Store in ChromaDB with enhanced metadata
+# =============================================================================
+
 # Import required libraries for ChromaDB, LangChain, and document processing
 from langchain_nvidia_ai_endpoints import NVIDIAEmbeddings
 from langchain_chroma import Chroma
@@ -32,7 +57,41 @@ text_splitter = RecursiveCharacterTextSplitter(
 
 # Enhanced chunking with section metadata extraction
 def extract_section_metadata(pages):
-    """Extract section titles and enhance chunks with metadata"""
+    """
+    Extract section titles and enhance chunks with comprehensive metadata.
+    
+    This function implements advanced document analysis to identify section
+    boundaries and extract meaningful metadata for improved retrieval.
+    
+    Features:
+    - Automatic section header detection using heuristics
+    - Cross-reference identification for context boosting
+    - Comprehensive metadata tagging for each chunk
+    - Section-aware chunking that preserves document structure
+    
+    Args:
+        pages (list): List of Document objects from PyPDFLoader
+        
+    Returns:
+        list: Enhanced Document objects with rich metadata including:
+            - page: Page number in original document
+            - section: Detected section title or "General Content"
+            - chunk_index: Position within the page
+            - source: Original document source path
+            - chunk_size: Character count for the chunk
+            - has_cross_reference: Boolean indicating cross-references
+            
+    Section Detection Heuristics:
+    - Lines under 100 characters but over 5 characters
+    - Title case or uppercase formatting
+    - Contains keywords like 'chapter', 'section', 'introduction', etc.
+    - Does not end with a period (not a sentence)
+    
+    Cross-Reference Detection:
+    - Identifies phrases like 'see section', 'refer to', 'as mentioned'
+    - Directional references: 'above', 'below', 'previous', 'following'
+    - Document structure references: 'chapter', 'page'
+    """
     enhanced_docs = []
     
     for page in pages:
