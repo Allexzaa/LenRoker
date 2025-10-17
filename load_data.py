@@ -35,7 +35,19 @@ import key_param
 
 # Load PDF document
 # PyPDFLoader will extract text from each page of the PDF
-loader = PyPDFLoader(r"C:\Users\aniss\Desktop\Website Files\RAG-MongoDB\Cloud Fundamentals 2 Syllabus.pdf")
+# =============================================================================
+# DOCUMENT CONFIGURATION
+# =============================================================================
+# Update this path to point to your PDF document
+# Examples:
+#   - loader = PyPDFLoader("documents/my_document.pdf")
+#   - loader = PyPDFLoader("research_paper.pdf") 
+#   - loader = PyPDFLoader("policy_manual.pdf")
+
+# TODO: Replace with your actual PDF file path
+DOCUMENT_PATH = "your_document.pdf"  # ← Update this path!
+
+loader = PyPDFLoader(DOCUMENT_PATH)
 pages = loader.load()
 cleaned_pages = []
 

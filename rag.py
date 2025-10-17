@@ -134,4 +134,4 @@ REASONING & FINAL ANSWER:
 
     return answer
 
-print(query_data("When did MongoDB begin supporting multi-document transactions?"))
+print(query_data("What are the main topics covered in this document?"))

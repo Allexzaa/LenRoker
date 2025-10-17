@@ -160,7 +160,7 @@ Before you begin, ensure you have the following:
 1. **Clone or download this repository**
 
 ```bash
-cd RAG-MongoDB
+cd lenroker
 ```
 
 2. **Install Python dependencies**
@@ -237,7 +237,7 @@ Edit the query at the bottom of `rag.py` to ask different questions.
 <summary><h2>📁 Project Structure</h2></summary>
 
 ```
-RAG-MongoDB/
+lenroker/
 ├── app.py                  # Gradio web interface with Multi-Stage RAG
 ├── load_data.py           # PDF processing script
 ├── rag.py                 # Simple query script
@@ -247,7 +247,7 @@ RAG-MongoDB/
 ├── chat_histories.json    # Saved chat conversations (auto-created)
 ├── chroma_db/             # Vector database storage (auto-created)
 ├── chroma_db_temp/        # Temporary storage for UI uploads
-└── sample_files/          # Sample PDF documents (optional)
+└── documents/             # Your PDF documents (optional)
 ```
 
 </details>
@@ -654,7 +654,7 @@ chunk_overlap=200   # Substantial overlap maintains continuity
 Each chunk includes rich metadata:
 ```python
 {
-    "section": "Cloud Fundamentals Overview",
+    "section": "Document Overview",
     "page": 15,
     "chunk_index": 3,
     "has_cross_reference": True,
@@ -670,7 +670,7 @@ Each chunk includes rich metadata:
 - +0.2 boost for cross-reference presence  
 - +0.1 boost for larger chunks (more context)
 
-**Example:** Question about "MongoDB transactions" will boost chunks from "Transaction Management" sections.
+**Example:** Question about "cloud security" will boost chunks from "Security" or "Cloud Security" sections.
 
 </details>
 
